@@ -1,13 +1,14 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
+import ApiError from '../../error-handler/ApiErrorHandler.js';
 
+// Create user schema
 const userSchema = new mongoose.Schema(
     {
-        username: {
+        name: {
             type: String,
             required: true,
-            unique: true,
             trim: true,
         },
         email: {
@@ -56,10 +57,17 @@ const userSchema = new mongoose.Schema(
     }
 );
 
-// Hash password before saving
+// Check for existing email before saving
 userSchema.pre('save', async function (next) {
+    // Check if email is unique
+    const existingUser = await this.constructor.findOne({ email: this.email });
+    if (existingUser && this.isModified('email')) {
+        return next(new ApiError(409, 'User already exists'));
+    }
+
     if (!this.isModified('password')) return next();
 
+    // Hash password before saving
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
     next();

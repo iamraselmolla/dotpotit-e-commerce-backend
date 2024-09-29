@@ -3,6 +3,7 @@ import sendResponse from "../../shared/sendResponse.js";
 import { UserServices } from "./user.service.js";
 import httpStatus from 'http-status';
 import crypto from 'crypto';
+import jwt from 'jsonwebtoken';
 import sendVerificationEmail from "../../shared/sendMail.js";
 
 const createAnUser = catchAsyncFunction(async (req, res, next) => {
@@ -37,38 +38,64 @@ const loginUser = catchAsyncFunction(async (req, res, next) => {
     const { email, password } = req.body;
 
     try {
-        if (!email || !password) {
-            return sendResponse(res, {
-                statusCode: httpStatus.BAD_REQUEST,
-                success: false,
-                message: "Email and password are required.",
-            });
-        }
+        // Authenticate user with email and password
+        const user = await UserServices.loginUser(email, password);
 
-        // Call the login service
-        const result = await UserServices.loginUser(email, password);
+        // Generate a JWT token after successful login
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
 
-        // Set the JWT token as a cookie without expiration
-        res.cookie('jwt', result.token, {
-            httpOnly: true, // Mitigate XSS
+        // Set the token in the cookie (httpOnly)
+        res.cookie('jwttoken', token, {
+            httpOnly: true, // Prevent client-side access
             secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
+            sameSite: 'Strict', // CSRF protection
+        });
+
+        // Set a second cookie for tracking login state
+        res.cookie('dotpotItSign', true, {
+            secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
+            sameSite: 'Strict', // CSRF protection
         });
 
         sendResponse(res, {
             statusCode: httpStatus.OK,
             success: true,
-            message: "Login successful.",
-            data: {
-                user: {
-                    id: result.user._id,
-                    email: result.user.email,
-                    name: result.user.name,
-                },
-            },
+            message: "Login successful",
+            data: user, // Send back minimal user info
         });
     } catch (error) {
-        next(error); // Pass the error to the next middleware
+        next(error); // Pass the error to the error handler middleware
     }
 });
 
-export const UserController = { createAnUser, loginUser };
+const verifyToken = catchAsyncFunction(async (req, res) => {
+    const { token } = req.body; // Get token from the request parameters
+    console.log(token)
+    // Find user by verification token
+    const user = await UserServices.findByVerificationToken(token);
+
+    // Check if the user exists and the token has not expired
+    if (!user || user.verificationTokenExpires < Date.now()) {
+        return sendResponse(res, {
+            statusCode: httpStatus.BAD_REQUEST,
+            success: false,
+            message: 'Invalid or expired token.',
+        });
+    }
+
+    // Update user data
+    user.isVerified = true; // Mark user as verified
+    // user.verificationToken = undefined; // Optional: Remove the verification token
+    // user.verificationTokenExpires = undefined; // Optional: Remove expiration date
+    await user.save();
+
+    return sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'Email verified successfully!',
+        data: user, // You can choose to return user data if needed
+    });
+});
+
+
+export const UserController = { createAnUser, loginUser, verifyToken };

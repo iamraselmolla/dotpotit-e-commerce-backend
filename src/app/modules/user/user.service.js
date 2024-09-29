@@ -5,6 +5,7 @@ const createAnUser = async (data) => {
     const user = await User.create(data);
     return user;
 };
+
 const loginUser = async (email, password) => {
     // Find the user by email
     const user = await User.findOne({ email });
@@ -23,11 +24,12 @@ const loginUser = async (email, password) => {
         throw new ApiError(401, "Invalid email or password");
     }
 
-    // Generate a JWT token
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-        expiresIn: '1d', // Optional, adjust as needed
-    });
-
-    return { user, token };
+    // Return the user object, no token generation here
+    return user;
 };
-export const UserServices = { createAnUser, loginUser }
+
+const findByVerificationToken = async (token) => {
+    return await User.findOne({ verificationToken: token });
+};
+
+export const UserServices = { createAnUser, loginUser, findByVerificationToken };

@@ -4,6 +4,7 @@ const UserRouter = express.Router();
 
 UserRouter.post("/create-user", UserController.createAnUser);
 UserRouter.post('/login', UserController.loginUser);
+UserRouter.post('/verify-user', UserController.verifyToken);
 
 
 

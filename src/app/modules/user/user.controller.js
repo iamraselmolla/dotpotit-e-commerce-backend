@@ -44,17 +44,19 @@ const loginUser = catchAsyncFunction(async (req, res, next) => {
         // Generate a JWT token after successful login
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
 
-        // Set the token in the cookie (httpOnly)
         res.cookie('jwttoken', token, {
             httpOnly: true, // Prevent client-side access
             secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
-            sameSite: 'none', // CSRF protection
+            sameSite: 'Strict', // CSRF protection
+            maxAge: 30 * 24 * 60 * 60 * 1000 // Cookie expiration (optional: set to 30 days)
         });
 
         // Set a second cookie for tracking login state
         res.cookie('dotpotItSign', true, {
+            httpOnly: false, // You may want this to be accessible from JS
             secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
-            sameSite: 'none', // CSRF protection
+            sameSite: 'Strict', // CSRF protection
+            maxAge: 30 * 24 * 60 * 60 * 1000 // Cookie expiration (optional: set to 30 days)
         });
 
         sendResponse(res, {

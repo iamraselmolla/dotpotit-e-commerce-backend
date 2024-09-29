@@ -3,6 +3,7 @@ import sendResponse from "../../shared/sendResponse.js";
 import { UserServices } from "./user.service.js";
 import httpStatus from 'http-status';
 import crypto from 'crypto';
+import sendVerificationEmail from "../../shared/sendMail.js";
 
 const createAnUser = catchAsyncFunction(async (req, res, next) => {
     try {
@@ -13,6 +14,7 @@ const createAnUser = catchAsyncFunction(async (req, res, next) => {
             user.verificationToken = token;
             user.verificationTokenExpires = Date.now() + 24 * 60 * 60 * 1000;
             await user.save(); // Token expires in 24 hours
+            await sendVerificationEmail(req.body?.email, token)
             sendResponse(res, {
                 statusCode: httpStatus.CREATED, // Changed to CREATED status
                 success: true,

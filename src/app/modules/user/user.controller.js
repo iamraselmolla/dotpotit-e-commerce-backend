@@ -48,20 +48,26 @@ const loginUser = catchAsyncFunction(async (req, res, next) => {
         res.cookie('jwttoken', token, {
             httpOnly: true, // Prevent client-side access
             secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
-            sameSite: 'Strict', // CSRF protection
+            sameSite: 'none', // CSRF protection
         });
 
         // Set a second cookie for tracking login state
         res.cookie('dotpotItSign', true, {
             secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
-            sameSite: 'Strict', // CSRF protection
+            sameSite: 'none', // CSRF protection
         });
 
         sendResponse(res, {
             statusCode: httpStatus.OK,
             success: true,
             message: "Login successful",
-            data: user, // Send back minimal user info
+            data: {
+                userId: user._id,
+                email: user.email,
+                name: user.name,
+                role: user.role,
+                isVerified: user.isVerified
+            }, // Send back minimal user info
         });
     } catch (error) {
         next(error); // Pass the error to the error handler middleware
@@ -70,7 +76,6 @@ const loginUser = catchAsyncFunction(async (req, res, next) => {
 
 const verifyToken = catchAsyncFunction(async (req, res) => {
     const { token } = req.body; // Get token from the request parameters
-    console.log(token)
     // Find user by verification token
     const user = await UserServices.findByVerificationToken(token);
 

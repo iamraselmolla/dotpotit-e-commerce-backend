@@ -7,8 +7,9 @@ const createAnUser = async (data) => {
 };
 
 const loginUser = async (email, password) => {
+
     // Find the user by email
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).select("+password");
     if (!user) {
         throw new ApiError(401, "Invalid email or password");
     }
@@ -23,6 +24,7 @@ const loginUser = async (email, password) => {
     if (!isMatch) {
         throw new ApiError(401, "Invalid email or password");
     }
+    console.log(user)
 
     // Return the user object, no token generation here
     return user;

@@ -1,23 +1,29 @@
 import catchAsyncFunction from "../../shared/catchAsynFunc.js";
 import sendResponse from "../../shared/sendResponse.js";
 import { UserServices } from "./user.service.js";
-import httpStatus from 'http-status'; // Make sure to import this if you're using http status codes
+import httpStatus from 'http-status';
+import crypto from 'crypto';
 
 const createAnUser = catchAsyncFunction(async (req, res, next) => {
     try {
         if (req.body.email && req.body.password && req.body.name) {
-            const result = await UserServices.createAnUser(req.body);
+            // Call service to create user
+            const user = await UserServices.createAnUser(req.body);
+            const token = crypto.randomBytes(20).toString('hex');
+            user.verificationToken = token;
+            user.verificationTokenExpires = Date.now() + 24 * 60 * 60 * 1000;
+            await user.save(); // Token expires in 24 hours
             sendResponse(res, {
-                statusCode: httpStatus.OK,
+                statusCode: httpStatus.CREATED, // Changed to CREATED status
                 success: true,
-                message: "User Created Successfully",
-                data: result,
+                message: "User Created Successfully. Verification email sent.",
+                data: { userId: user._id, email: user.email }, // Don't expose the password or sensitive info
             });
         } else {
             sendResponse(res, {
                 statusCode: httpStatus.BAD_REQUEST,
                 success: false,
-                message: "Email and password are required.",
+                message: "Email, password, and name are required.",
             });
         }
     } catch (error) {

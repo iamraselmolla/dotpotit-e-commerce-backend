@@ -1,6 +1,5 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
-import crypto from 'crypto';
 import ApiError from '../../error-handler/ApiErrorHandler.js';
 
 // Create user schema
@@ -43,14 +42,7 @@ const userSchema = new mongoose.Schema(
         profileImage: {
             type: String,
             default: 'default.jpg',
-        },
-        bio: {
-            type: String,
-            maxlength: 500,
-        },
-        tokens: {
-            type: [String],
-        },
+        }
     },
     {
         timestamps: true,
@@ -79,12 +71,12 @@ userSchema.methods.comparePassword = async function (inputPassword) {
 };
 
 // Generate a verification token
-userSchema.methods.generateVerificationToken = function () {
-    const token = crypto.randomBytes(20).toString('hex');
-    this.verificationToken = token;
-    this.verificationTokenExpires = Date.now() + 24 * 60 * 60 * 1000; // Token expires in 24 hours
-    return token;
-};
+// userSchema.methods.generateVerificationToken = function () {
+//     const token = crypto.randomBytes(20).toString('hex');
+//     this.verificationToken = token;
+//     this.verificationTokenExpires = Date.now() + 24 * 60 * 60 * 1000; // Token expires in 24 hours
+//     return token;
+// };
 
 const User = mongoose.model('User', userSchema);
 export default User;

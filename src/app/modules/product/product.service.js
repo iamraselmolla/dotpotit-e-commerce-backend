@@ -5,4 +5,9 @@ const createProduct = async (data) => {
     return product;
 }
 
-export const ProductServices = { createProduct }
+const getAllProducts = async () => {
+    const products = await Product.find();
+    return products;
+}
+
+export const ProductServices = { createProduct, getAllProducts }

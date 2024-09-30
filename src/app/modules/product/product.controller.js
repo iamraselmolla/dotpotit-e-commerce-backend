@@ -17,4 +17,18 @@ const createProduct = catchAsyncFunction(async (req, res, next) => {
     }
 });
 
-export const ProductController = { createProduct }
+const getAllProducts = catchAsyncFunction(async (req, res, next) => {
+    try {
+        const products = await ProductServices.getAllProducts();
+        sendResponse(res, {
+            statusCode: httpStatus.OK,
+            success: true,
+            message: "Products fetched successfully",
+            data: products
+        });
+    } catch (error) {
+        next(error);
+    }
+});
+
+export const ProductController = { createProduct, getAllProducts };

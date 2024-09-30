@@ -12,12 +12,12 @@ const productSchema = new Schema({
     colors: [{
         name: { type: String, required: true },
         price: { type: Number, required: true },
-        image: { type: String, required: true } // URL or file path of the image
+        image: { type: String } // URL or file path of the image
     }],
     memorySizes: [{ type: String, required: true }],
     gifts: [{
-        quantity: { type: Number, required: true },
-        gift: { type: String, required: true }
+        quantity: { type: Number, default: 1 },
+        gift: { type: String, default: 'Gift-Box' }
     }],
     category: { type: Schema.Types.ObjectId, ref: 'Category', required: true }, // Reference to Category Model
     brand: { type: String, required: true },

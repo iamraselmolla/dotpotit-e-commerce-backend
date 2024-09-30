@@ -14,5 +14,16 @@ const findProductById = async (id) => {
     const product = await Product.findById(id).populate('category');
     return product;
 }
+const incrementViewCount = async (id) => {
+    const product = await Product.findByIdAndUpdate(
+        id,
+        { $inc: { views: 1 } }, // Increment views count by 1
+        { new: true }
+    );
 
-export const ProductServices = { createProduct, getAllProducts, findProductById }
+    return product;
+}
+
+
+
+export const ProductServices = { createProduct, getAllProducts, findProductById, incrementViewCount }

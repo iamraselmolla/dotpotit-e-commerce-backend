@@ -44,5 +44,22 @@ const findProductById = catchAsyncFunction(async (req, res, next) => {
         next(error);
     }
 });
+const incrementViewCount = async (req, res) => {
+    const { id } = req.params;
 
-export const ProductController = { createProduct, getAllProducts, findProductById };
+    try {
+        // Find the product by ID and increment the view count
+        const product = await ProductServices.incrementViewCount(id);
+
+        sendResponse(res, {
+            statusCode: httpStatus.OK,
+            success: true,
+            message: "View count incremented successfully",
+            data: product
+        })
+    } catch (error) {
+        next(error)
+    }
+};
+
+export const ProductController = { createProduct, getAllProducts, findProductById, incrementViewCount };

@@ -8,4 +8,6 @@ ProductRouter.get("/get-products", ProductController.getAllProducts);
 
 ProductRouter.get("/get-product/:id", ProductController.findProductById);
 
+ProductRouter.put("/increment-view-count/:id", ProductController.incrementViewCount);
+
 export default ProductRouter;

@@ -6,4 +6,6 @@ ProductRouter.post("/create-product", ProductController.createProduct);
 
 ProductRouter.get("/get-products", ProductController.getAllProducts);
 
+ProductRouter.get("/get-product/:id", ProductController.findProductById);
+
 export default ProductRouter;

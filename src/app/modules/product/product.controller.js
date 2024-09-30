@@ -31,4 +31,18 @@ const getAllProducts = catchAsyncFunction(async (req, res, next) => {
     }
 });
 
-export const ProductController = { createProduct, getAllProducts };
+const findProductById = catchAsyncFunction(async (req, res, next) => {
+    try {
+        const product = await ProductServices.findProductById(req.params.id);
+        sendResponse(res, {
+            statusCode: httpStatus.OK,
+            success: true,
+            message: "Product fetched successfully",
+            data: product
+        });
+    } catch (error) {
+        next(error);
+    }
+});
+
+export const ProductController = { createProduct, getAllProducts, findProductById };

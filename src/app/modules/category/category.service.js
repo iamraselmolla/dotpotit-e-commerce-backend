@@ -5,4 +5,9 @@ const addCategory = async (data) => {
     return category;
 };
 
-export const CategoryServices = { addCategory }
+const getAllCategories = async () => {
+    const categories = await Category.find();
+    return categories;
+};
+
+export const CategoryServices = { addCategory, getAllCategories }

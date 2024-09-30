@@ -20,5 +20,21 @@ const addCategory = catchAsyncFunction(async (req, res, next) => {
     }
 });
 
+const getAllCategories = catchAsyncFunction(async (req, res, next) => {
+    try {
+        const categories = await CategoryServices.getAllCategories();
+        sendResponse(res, {
+            statusCode: httpStatus.OK,
+            success: true,
+            message: "Categories fetched successfully",
+            data: categories
+        }
+        )
+    }
+    catch (error) {
+        next(error);
+    }
+});
 
-export const CategoryController = { addCategory }
+
+export const CategoryController = { addCategory, getAllCategories }

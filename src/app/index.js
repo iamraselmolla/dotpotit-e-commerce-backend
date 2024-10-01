@@ -25,9 +25,9 @@ app.use("/api/v1", router);
 // Error handling middleware
 app.use(globalErrorHandler);
 
-app.use('/ssl-request', (req, res) => {
+app.post('/api/v1/ssl-request', (req, res) => {
     const data = {
-        total_amount: 100,
+        total_amount: req.body.totalAmount,
         currency: 'BDT',
         tran_id: 'REF123', // use unique tran_id for each api call
         success_url: `${process.env.ROOT}/success`,
@@ -59,14 +59,15 @@ app.use('/ssl-request', (req, res) => {
     const sslcz = new SSLCommerzPayment(process.env.STORE_ID, process.env.STORE_PASS, false)
     sslcz.init(data).then(apiResponse => {
         if (apiResponse?.GatewayPageURL) {
-            return res.status(httpStatus.OK).redirect(apiResponse?.GatewayPageURL)
+            return res.status(httpStatus.OK).json({ url: apiResponse?.GatewayPageURL });
         } else {
             return res.status(httpStatus.BAD_REQUEST).json({
                 success: false,
                 error: apiResponse
-            })
+            });
         }
     });
+
 });
 
 app.post('/success', (req, res) => {

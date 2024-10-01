@@ -8,7 +8,7 @@ import router from "./routes/index.js"; // Assuming you have a router file named
 import bodyParser from "body-parser";
 const app = express();
 app.use(cors({
-    origin: 'http://localhost:3000', // Your front-end URL
+    origin: process.env.FRONTEND_URL, // Your front-end URL
     credentials: true, // Allow cookies to be sent
 }));
 app.use(express.json());

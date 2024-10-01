@@ -8,7 +8,7 @@ const sendVerificationEmail = async (email, token) => {
         },
     });
 
-    const verificationUrl = `http://localhost:3000/verify/${token}`; // Adjust for production
+    const verificationUrl = `${process.env.FRONTEND_URL}/verify/${token}`; // Adjust for production
 
     // Set the expiration date to 24 hours from now
     const expirationDate = new Date(Date.now() + 24 * 60 * 60 * 1000);

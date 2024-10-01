@@ -1,8 +1,5 @@
-import { model, Schema } from "mongoose";
-
-
 const transactionSchema = new Schema({
-    userId: {
+    user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true,
@@ -34,6 +31,28 @@ const transactionSchema = new Schema({
         type: String,
         enum: ['SSLCommerz', 'Card', 'Mobile Banking'],
         default: 'SSLCommerz',
+    },
+    shippingData: {
+        name: {
+            type: String,
+            required: true,
+        },
+        phone: {
+            type: String,
+            required: true,
+        },
+        address: {
+            type: String,
+            required: true,
+        },
+        city: {
+            type: String,
+            required: true,
+        },
+        postcode: {
+            type: String,
+            required: true,
+        },
     },
     createdAt: {
         type: Date,

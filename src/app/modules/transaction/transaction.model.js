@@ -12,6 +12,10 @@ const transactionSchema = new Schema({
             ref: 'Product',
             required: true,
         },
+        name: {
+            type: String,
+            required: true,
+        },
         price: {
             type: Number,
             required: true,

@@ -4,6 +4,7 @@ import Transaction from "./transaction.model.js";
 import nodemailer from "nodemailer";
 import Product from "../product/product.model.js";
 import { PurchaseServices } from "./transaction.service.js";
+import sendResponse from "../../shared/sendResponse.js";
 
 // In-memory storage for demonstration (use a database or Redis for production)
 const transactions = {};
@@ -13,10 +14,10 @@ const paymentCreate = async (req, res) => {
 
     const data = {
         total_amount: req.body.totalAmount,
-        success_url: `${process.env.ROOT}/ssl-request/success?tran_id=${transactionId}`,
-        fail_url: `${process.env.ROOT}/ssl-request/fail`,
-        cancel_url: `${process.env.ROOT}/ssl-request/cancel`,
-        ipn_url: `${process.env.ROOT}/ssl-request/ipn`,
+        success_url: `${process.env.ROOT}/payment/success?tran_id=${transactionId}`,
+        fail_url: `${process.env.ROOT}/payment/fail`,
+        cancel_url: `${process.env.ROOT}/payment/cancel`,
+        ipn_url: `${process.env.ROOT}/payment/ipn`,
         currency: 'BDT',
         tran_id: transactionId,
         shipping_method: 'Courier',
@@ -132,13 +133,8 @@ const success = async (req, res) => {
         delete transactions[tran_id];
 
         // Redirect the user to their purchase dashboard
-        return res.status(httpStatus.OK).json({
-            success: true,
-            message: "Payment successful",
-            transactionId: tran_id,
-            transactionData: result,
-            redirectUrl: `${process.env.FRONTEND_URL}/dashboard/purchase`,
-        });
+        return res.redirect(`${process.env.FRONTEND_URL}/history?payment=success`);
+
 
     } catch (error) {
         return res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
@@ -241,8 +237,9 @@ const ipn = async (req, res) => {
 };
 
 const getUserAllPurchases = async (req, res, next) => {
+    const { user } = req.params
     try {
-        const result = await PurchaseServices.getUserAllPurchases(req.user);
+        const result = await PurchaseServices.getUserAllPurchases(user);
         sendResponse(res, {
             statusCode: httpStatus.OK,
             success: true,

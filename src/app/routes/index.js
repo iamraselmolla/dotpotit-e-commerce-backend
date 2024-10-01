@@ -19,7 +19,7 @@ const routerArr = [
         router: ProductRouter,
     },
     {
-        path: "/ssl-request",
+        path: "/payment",
         router: transactionRouter
     }
 ];

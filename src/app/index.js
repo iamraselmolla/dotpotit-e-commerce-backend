@@ -24,36 +24,6 @@ app.use("/api/v1", router);
 // Error handling middleware
 app.use(globalErrorHandler);
 
-app.post('/api/v1/ssl-request', (req, res) => {
-
-
-});
-
-app.post('/success', (req, res) => {
-    return res.status(httpStatus.OK).json({
-        success: true,
-        message: "Payment success",
-        data: req.body
-    })
-});
-app.post('/fail', (req, res) => {
-    return res.status(httpStatus.NOT_FOUND).json({
-        success: false,
-        message: "Payment failed",
-        data: req.body
-    })
-});
-app.post('/cancel', (req, res) => {
-    return res.status(httpStatus.NOT_FOUND).json({
-        success: false,
-        message: "Payment canceled",
-        data: req.body
-    })
-});
-app.post('/ipn', (req, res) => {
-    res.send("IPN received")
-});
-
 
 // 404 Not Found handler
 app.use((req, res, next) => {

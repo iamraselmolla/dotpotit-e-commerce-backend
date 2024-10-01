@@ -28,6 +28,12 @@ app.use(globalErrorHandler);
 app.post('/api/v1/ssl-request', (req, res) => {
     const data = {
         total_amount: req.body.totalAmount,
+        success_url: `${process.env.ROOT}/success`,
+        fail_url: `${process.env.ROOT}/fail`,
+        cancel_url: `${process.env.ROOT}/cancel`,
+        ipn_url: `${process.env.ROOT}/ipn`,
+        cus_email: 'customer@example.com',
+        total_amount: 100,
         currency: 'BDT',
         tran_id: 'REF123', // use unique tran_id for each api call
         success_url: `${process.env.ROOT}/success`,

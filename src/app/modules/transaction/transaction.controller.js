@@ -3,6 +3,7 @@ import SSLCommerzPayment from "sslcommerz-lts";
 import Transaction from "./transaction.model.js";
 import nodemailer from "nodemailer";
 import Product from "../product/product.model.js";
+import { PurchaseServices } from "./transaction.service.js";
 
 // In-memory storage for demonstration (use a database or Redis for production)
 const transactions = {};
@@ -239,4 +240,19 @@ const ipn = async (req, res) => {
     });
 };
 
-export default { paymentCreate, success, cancel, fail, ipn };
+const getUserAllPurchases = async (req, res, next) => {
+    try {
+        const result = await PurchaseServices.getUserAllPurchases(req.user);
+        sendResponse(res, {
+            statusCode: httpStatus.OK,
+            success: true,
+            message: "User purchases fetched successfully",
+            data: result
+        })
+    }
+    catch (error) {
+        next(error)
+    }
+}
+
+export default { paymentCreate, success, cancel, fail, ipn, getUserAllPurchases };

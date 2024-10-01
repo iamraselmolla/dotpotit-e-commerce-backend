@@ -82,7 +82,7 @@ const success = async (req, res) => {
             return {
                 productId: dbProduct._id,
                 name: dbProduct.name,
-                image: dbProduct.image, // Assuming the product has an image field
+                image: dbProduct?.images[0], // Assuming the product has an image field
                 price: transactionProduct.price,
                 quantity: transactionProduct.quantity,
                 totalPrice: transactionProduct.price * transactionProduct.quantity,
@@ -165,7 +165,7 @@ const sendInvoiceEmail = async (email, products, totalAmount, shippingData) => {
         return `
             <tr style="border-bottom: 1px solid #ccc;">
                 <td style="padding: 10px;">
-                    <img src="${product.image}" alt="${product.name}" style="width: 50px; height: 50px;">
+                    <img src="${product?.image}" alt="${product.name}" style="width: 50px; height: 50px;">
                 </td>
                 <td style="padding: 10px;">${product.name}</td>
                 <td style="padding: 10px;">${product.quantity}</td>

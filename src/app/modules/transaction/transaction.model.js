@@ -35,11 +35,6 @@ const transactionSchema = new Schema({
         enum: ['SSLCommerz', 'Card', 'Mobile Banking'],
         default: 'SSLCommerz',
     },
-    transactionStatus: {
-        type: String,
-        enum: ['Pending', 'Completed', 'Failed', 'Canceled'],
-        default: 'Pending',
-    },
     createdAt: {
         type: Date,
         default: Date.now,

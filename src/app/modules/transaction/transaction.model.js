@@ -1,3 +1,5 @@
+import mongoose, { model, Schema } from "mongoose";
+
 const transactionSchema = new Schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,
@@ -38,6 +40,10 @@ const transactionSchema = new Schema({
             required: true,
         },
         phone: {
+            type: String,
+            required: true,
+        },
+        email: {
             type: String,
             required: true,
         },

@@ -67,9 +67,9 @@ const loginUser = catchAsyncFunction(async (req, res, next) => {
                 email: user.email,
                 name: user.name,
                 role: user.role,
-                isVerified: user.isVerified
+                isVerified: user.isVerified,
+                jwttoken: token,
             }, // Send back minimal user info
-            jwttoken: token,
         });
     } catch (error) {
         next(error); // Pass the error to the error handler middleware

@@ -68,7 +68,7 @@ const loginUser = catchAsyncFunction(async (req, res, next) => {
                 name: user.name,
                 role: user.role,
                 isVerified: user.isVerified,
-                jwttoken: token,
+                token: token,
             }, // Send back minimal user info
         });
     } catch (error) {

@@ -44,7 +44,7 @@ const findProductById = catchAsyncFunction(async (req, res, next) => {
         next(error);
     }
 });
-const incrementViewCount = async (req, res) => {
+const incrementViewCount = async (req, res, next) => {
     const { id } = req.params;
 
     try {

@@ -7,8 +7,6 @@ import mongoose from 'mongoose';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
-
-// Set up multer for file uploads
 const storage = multer.memoryStorage(); // Using memory storage to work with buffers in sharp
 const upload = multer({
     storage: storage,
@@ -44,63 +42,82 @@ const createProduct = catchAsyncFunction(async (req, res, next) => {
     session.startTransaction();
 
     try {
-        uploadFiles(req, res, async function (err) {
-            if (err instanceof multer.MulterError) {
-                console.log("Multer error occurred during file upload");
-                return next(err);
-            } else if (err) {
-                return next(err);
-            }
-
-            // Proceed with product creation
-            const productData = req.body;
-            const mainImages = req.files['images'] ? req.files['images'][0] : null;
-            const colorImages = req.files['colorsImg'] || [];
-
-            const productIdOrName = productData.name || 'default';
-            const uploadDir = `./uploads/${productIdOrName}/`;
-
-            // Ensure the directory exists
-            if (!fs.existsSync(uploadDir)) {
-                fs.mkdirSync(uploadDir, { recursive: true });
-            }
-
-            // Process main image
-            let processedMainImage = null;
-            if (mainImages) {
-                processedMainImage = await processImage(mainImages.buffer, uploadDir, mainImages.originalname);
-            }
-
-            // Process color images
-            const processedColorImages = await Promise.all(
-                colorImages.map(img => processImage(img.buffer, uploadDir, img.originalname))
-            );
-
-            // Prepare product data with image paths
-            const newProductData = {
-                ...productData,
-                images: processedMainImage,  // Store main image path
-                colors: productData?.colors ? JSON.parse(productData.colors).map((color, index) => ({
-                    ...color,
-                    image: processedColorImages[index] || null  // Assign the processed color image
-                })) : []
-            };
-            console.log(newProductData)
-
-            // Create the product in the database using a transaction
-            const product = await ProductServices.createProduct(newProductData, { session });
-
-            // Commit the transaction
-            await session.commitTransaction();
-            session.endSession();
-
-            // Send response back to the client
-            sendResponse(res, {
-                statusCode: httpStatus.CREATED,
-                success: true,
-                message: "Product created successfully",
-                data: product
+        // Wrap the multer file upload logic in a Promise to ensure it waits
+        await new Promise((resolve, reject) => {
+            uploadFiles(req, res, (err) => {
+                if (err instanceof multer.MulterError) {
+                    console.log("Multer error occurred during file upload");
+                    return reject(err);
+                } else if (err) {
+                    return reject(err);
+                }
+                resolve();
             });
+        });
+
+        // Proceed with product creation
+        const productData = req.body;
+        if (typeof productData.gifts === "string") {
+            productData.gifts = JSON.parse(productData.gifts);
+        }
+        if (typeof productData.price === "string") {
+            productData.price = JSON.parse(productData.price);
+        }
+        if (typeof productData.features === "string") {
+            productData.features = JSON.parse(productData.features);
+        }
+        if (typeof productData.memorySizes === "string") {
+            productData.memorySizes = JSON.parse(productData.memorySizes);
+        }
+        // if (typeof productData.colors === "string") {
+        //     productData.colors = JSON.parse(productData.colors);
+        // }
+        const mainImages = req.files['images'] ? req.files['images'][0] : null;
+        const colorImages = req.files['colorsImg'] || [];
+
+        const productIdOrName = productData.name || 'default';
+        const uploadDir = `./uploads/${productIdOrName}/`;
+
+        // Ensure the directory exists
+        if (!fs.existsSync(uploadDir)) {
+            fs.mkdirSync(uploadDir, { recursive: true });
+        }
+
+        // Process main image
+        let processedMainImage = null;
+        if (mainImages) {
+            processedMainImage = await processImage(mainImages.buffer, uploadDir, mainImages.originalname);
+        }
+
+        // Process color images
+        const processedColorImages = await Promise.all(
+            colorImages.map(img => processImage(img.buffer, uploadDir, img.originalname))
+        );
+
+        // Prepare product data with image paths
+        const newProductData = {
+            ...productData,
+            images: processedMainImage,  // Store main image path
+            colors: productData?.colors ? JSON.parse(productData.colors).map((color, index) => ({
+                ...color,
+                image: processedColorImages[index] || null  // Assign the processed color image
+            })) : []
+        };
+        console.log(newProductData);
+
+        // Create the product in the database using a transaction
+        const product = await ProductServices.createProduct(newProductData, { session });
+
+        // Commit the transaction
+        await session.commitTransaction();
+        session.endSession();
+
+        // Send response back to the client
+        sendResponse(res, {
+            statusCode: httpStatus.OK,
+            success: true,
+            message: "Product created successfully",
+            data: product
         });
     } catch (error) {
         // Rollback the transaction if something goes wrong

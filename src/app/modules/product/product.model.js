@@ -21,7 +21,7 @@ const productSchema = new Schema({
     }],
     category: { type: Schema.Types.ObjectId, ref: 'Category', required: true }, // Reference to Category Model
     brand: { type: String, required: true },
-    images: [{ type: String, required: true }], // Array of image URLs or file paths
+    images: { type: String, required: true }, // Array of image URLs or file paths
     inStock: { type: Boolean, default: true },
     shippingFrom: { type: String, required: true },
     views: { type: Number, default: 0 }, // For tracking most viewed products

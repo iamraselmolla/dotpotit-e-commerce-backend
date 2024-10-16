@@ -1,14 +1,12 @@
 import express from "express";
 import { ProductController } from "./product.controller.js";
-import multer from 'multer';
+import upload from "../../shared/multerUpload.js";
 
-const upload = multer({ storage: multer.memoryStorage() });
 const ProductRouter = express.Router();
 
-ProductRouter.post("/create-product", upload.fields([
-    { name: 'images', maxCount: 5 },
-    { name: 'colors', maxCount: 10 }
-]), ProductController.createProduct);
+ProductRouter.post('/create-product', upload, ProductController.createProduct);
+
+
 
 ProductRouter.get("/get-products", ProductController.getAllProducts);
 ProductRouter.get("/get-product/:id", ProductController.findProductById);
